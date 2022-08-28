@@ -31,7 +31,14 @@ def decrypt(password, text):
     f = Fernet(base64.urlsafe_b64encode(kdf.derive(password.encode())))
     return f.decrypt(text.encode()).decode()
 
-
+def list_accounts(data):
+    list_names_account = []
+    number_print = 1
+    for i in data["accounts"]:
+        print(f"{number_print}){i}")
+        number_print += 1
+        list_names_account.append(i)
+    return(list_names_account)
 
 #actions
 def create(data, password):
@@ -60,19 +67,3 @@ def create(data, password):
         data["accounts"][name_account]["password"] = encrypt(password, input("password: "))
     os.system("clear")
     return data
-
-a = {
-    "data_base_name":"name",
-    "accounts":{
-        "name":{
-            "user":"encrypt",
-            "password":"encrypt"
-        }
-    }
-}
-#print(encrypt("hola", "o:l<=73#x}¿*"))
-print(create(a, "hola"))
-
-        
-
-

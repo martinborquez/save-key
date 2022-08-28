@@ -67,3 +67,7 @@ def create(data, password):
         data["accounts"][name_account]["password"] = encrypt(password, input("password: "))
     os.system("clear")
     return data
+def view(data, password, name):
+    print("---"+name+"---")
+    print("username: " + decrypt(password, data["accounts"][name]["user"]))
+    print("password: " + decrypt(password, data["accounts"][name]["password"]))

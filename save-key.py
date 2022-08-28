@@ -31,6 +31,19 @@ def decrypt(password, text):
     f = Fernet(base64.urlsafe_b64encode(kdf.derive(password.encode())))
     return f.decrypt(text.encode()).decode()
 
+def create_hash(text):
+    digest = hashes.Hash(hashes.SHA256())
+    digest.update(text.encode())
+    return str(digest.finalize())
+
+#get and save data
+def save_data(path, dictionary):
+    with open(path, "w") as objfile:
+        json.dump(dictionary, objfile)
+def read_data(path):
+    with open(path, "r") as objfile:
+        return json.load(objfile)
+
 def list_accounts(data):
     list_names_account = []
     number_print = 1
@@ -40,6 +53,23 @@ def list_accounts(data):
         list_names_account.append(i)
     return(list_names_account)
 
+def verify_file(data, password, path):
+    if "data_name" in data and "accounts" in data:
+
+        if data["data_name"] == create_hash(password):
+            return True
+        else:
+            return False
+    else:
+        passwd_1 = "pass_1"
+        passwd_2 = "pass_2"
+        os.system("clear")
+        print("Create New password to use")
+        while passwd_1 != passwd_2:
+            passwd_1 = getpass.getpass("New Password: ")
+            passwd_2 = getpass.getpass("Repeat Password: ")
+        save_data(path, {"data_name":create_hash(passwd_1),"accounts":{}})
+        return True
 #actions
 def create(data, password):
     name_account = input("name for account: ")
@@ -71,3 +101,9 @@ def view(data, password, name):
     print("---"+name+"---")
     print("username: " + decrypt(password, data["accounts"][name]["user"]))
     print("password: " + decrypt(password, data["accounts"][name]["password"]))
+
+if __name__ == '__main__':
+    data = read_data(sys.argv[1])
+    password = getpass.getpass("Password: ")
+    while verify_file(data, password, sys.argv[1]) != True:
+        password = getpass.getpass("Password: ")

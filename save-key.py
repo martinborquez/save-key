@@ -91,7 +91,6 @@ def create(data, password):
         passwd = ""
         for i in range(0, legth_password):
             passwd = passwd + characters[random.randint(0, len(characters)-1)]
-        print(password, passwd)
         data["accounts"][name_account]["password"] = encrypt(password, passwd)
     else:
         data["accounts"][name_account]["password"] = encrypt(password, input("password: "))
@@ -101,9 +100,73 @@ def view(data, password, name):
     print("---"+name+"---")
     print("username: " + decrypt(password, data["accounts"][name]["user"]))
     print("password: " + decrypt(password, data["accounts"][name]["password"]))
+    input("Next: ")
+    os.system("clear")
+def modify(data, password, name):
+    modify_option = input("1)user\n2)password\n")
+    if modify_option == "1":
+        data["accounts"][name]["user"] = encrypt(password, input("username: "))
+        return data
+    elif modify_option == "2":
+        select_random_or_not = ""
+        while select_random_or_not != "yes" and select_random_or_not != "no":
+            select_random_or_not = input("password random yes/no: ")
+        if select_random_or_not == "yes":
+            legth_password = None
+            while legth_password == None:
+                try:
+                    legth_password = int(input("password legth: "))
+                except:
+                    pass
+            characters = "qwertyuiopasdfghjklzxcvbnm1234567890,.;:^*¨Ç[]{}\~?¿'¡!$%&/()=#@<>-_"
+            passwd = ""
+            for i in range(0, legth_password):
+                passwd = passwd + characters[random.randint(0, len(characters)-1)]
+            data["accounts"][name]["password"] = encrypt(password, passwd)
+        else:
+            data["accounts"][name]["password"] = encrypt(password, input("password: "))
+        os.system("clear")
+        return data
+    else:
+        return modify(data, password, name)
+def remove(data, name):
+    print("remove "+name)
+    remove_option = input("yes/no: ")
+    if remove_option == "yes":
+        data["accounts"].pop(name)
+        return data
+    
 
 if __name__ == '__main__':
     data = read_data(sys.argv[1])
     password = getpass.getpass("Password: ")
     while verify_file(data, password, sys.argv[1]) != True:
         password = getpass.getpass("Password: ")
+    data = read_data(sys.argv[1])
+    run_app = True
+    while run_app == True:
+        os.system("clear")
+        print("__Menu__")
+        print("options:\n1)Create new account\n2)change account values\n3)view account values\n4)remove account")
+        election = input("election: ")
+        if election == "1":
+            create(data, password)
+        elif election == "2":
+            accounts = list_accounts(data)
+            try:
+                modify(data, password, accounts[int(input("selection: "))-1])
+            except:
+                print("invalid option")
+        elif election == "3":
+            accounts = list_accounts(data)
+            try:
+                view(data, password, accounts[int(input("selection: "))-1])
+            except:
+                print("invalid option")
+        elif election == "4":
+            accounts = list_accounts(data)
+            try:
+                remove(data, accounts[int(input("selection: "))-1])
+            except:
+                print("invalid option")
+        save_data(sys.argv[1], data)
